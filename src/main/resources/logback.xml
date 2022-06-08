@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true">
+  <property resource='application.properties' />
+  <!-- Send debug messages to System.out -->
+  <appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+    <!-- By default, encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder -->
+    <encoder>
+      <charset>utf-8</charset>
+      <Pattern>%d %-5level [%t] %logger{0}.%M:%line - %msg%n</Pattern>
+    </encoder>
+  </appender>
+  <!-- The FILE and ASYNC appenders are here as examples for a production
+		configuration -->
+  <appender name="dailyRollingFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>
+        ${logging.path}/app/app.%d{yyyy-MM-dd}.log.zip
+      </fileNamePattern>
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+    <encoder>
+      <charset>utf-8</charset>
+      <Pattern>%d %-5level [%t] %logger{0}.%M:%line - %msg%n</Pattern>
+    </encoder>
+  </appender>
+  <appender name="dailyRollingFileAppenderQueue" class="ch.qos.logback.classic.AsyncAppender">
+    <queueSize>10240</queueSize>
+    <appender-ref ref="dailyRollingFileAppender" />
+    <includeCallerData>true</includeCallerData>
+  </appender>
+  <logger name="com.example.demo" level="INFO" additivity="false">
+    <appender-ref ref="consoleAppender" />
+    <appender-ref ref="dailyRollingFileAppenderQueue" />
+  </logger>
+  <appender name="requestResponseFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>
+          ${logging.path}/requestResponse/request-response.%d{yyyy-MM-dd}.log.zip
+      </fileNamePattern>
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+    <encoder>
+      <charset>utf-8</charset>
+      <Pattern>%d %-5level [%t] %logger{0}.%M:%line - %msg%n</Pattern>
+    </encoder>
+  </appender>
+  <appender name="requestResponseFileAppenderQueue" class="ch.qos.logback.classic.AsyncAppender">
+    <queueSize>10240</queueSize>
+    <appender-ref ref="requestResponseFileAppender" />
+    <includeCallerData>true</includeCallerData>
+  </appender>
+  <logger name="com.example.demo.configuration.InternalRequestInterceptor" level="INFO" additivity="false">
+    <appender-ref ref="requestResponseFileAppenderQueue" />
+  </logger>
+
+  <appender name="externalRequestResponseFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>
+        ${logging.path}/external-requestResponse/request-response.%d{yyyy-MM-dd}.log.zip
+      </fileNamePattern>
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+    <encoder>
+      <charset>utf-8</charset>
+      <Pattern>%d %-5level [%t] %logger{0}.%M:%line - %msg%n</Pattern>
+    </encoder>
+  </appender>
+  <appender name="extRequestResponseFileAppenderQueue" class="ch.qos.logback.classic.AsyncAppender">
+    <queueSize>10240</queueSize>
+    <appender-ref ref="externalRequestResponseFileAppender" />
+    <includeCallerData>true</includeCallerData>
+  </appender>
+  <logger name="com.example.demo.configuration.ExternalIntercepter" level="INFO" additivity="false">
+    <appender-ref ref="extRequestResponseFileAppenderQueue" />
+  </logger>
+
+  <logger name="org.hibernate">
+    <level value="INFO" />
+    <appender-ref ref="dailyRollingFileAppenderQueue" />
+  </logger>
+  <logger name="org.hibernate.ejb.HibernatePersistence" level="INFO">
+    <appender-ref ref="dailyRollingFileAppenderQueue" />
+  </logger>
+  <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+    <resetJUL>true</resetJUL>
+  </contextListener>
+  <root level="INFO">
+    <appender-ref ref="consoleAppender" />
+    <appender-ref ref="dailyRollingFileAppenderQueue" />
+  </root>
+</configuration>
