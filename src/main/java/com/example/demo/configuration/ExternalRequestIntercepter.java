@@ -14,7 +14,7 @@ import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.util.StreamUtils;
 
-public class ExternalIRequestntercepter implements ClientHttpRequestInterceptor {
+public class ExternalRequestIntercepter implements ClientHttpRequestInterceptor {
 
   private final Logger log = LoggerFactory.getLogger(this.getClass());
 

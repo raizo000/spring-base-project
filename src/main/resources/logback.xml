@@ -70,7 +70,7 @@
     <appender-ref ref="externalRequestResponseFileAppender" />
     <includeCallerData>true</includeCallerData>
   </appender>
-  <logger name="com.example.demo.configuration.ExternalIntercepter" level="INFO" additivity="false">
+  <logger name="com.example.demo.configuration.ExternalRequestIntercepter" level="INFO" additivity="false">
     <appender-ref ref="extRequestResponseFileAppenderQueue" />
   </logger>
 
