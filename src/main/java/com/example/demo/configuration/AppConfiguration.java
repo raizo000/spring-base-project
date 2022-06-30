@@ -29,7 +29,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.BufferingClientHttpRequestFactory;
+import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.client.RestTemplate;
 
@@ -140,10 +143,19 @@ public class AppConfiguration {
     };
   }
 
+  // @Bean
+  // public RestTemplate restTemplate() {
+  //   RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory());
+  //   restTemplate.setInterceptors(Collections.singletonList(new ExternalRequestIntercepter()));
+  //   return restTemplate;
+  // }
+  
   @Bean
   public RestTemplate restTemplate() {
-    RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory());
-    restTemplate.setInterceptors(Collections.singletonList(new ExternalIRequestntercepter()));
+    ClientHttpRequestFactory factory =
+        new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory());
+    RestTemplate restTemplate = new RestTemplate(factory);
+    restTemplate.setInterceptors(Collections.singletonList(new ExternalRequestIntercepter()));
     return restTemplate;
   }
 
