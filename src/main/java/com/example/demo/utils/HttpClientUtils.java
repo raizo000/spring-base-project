@@ -2,13 +2,11 @@ package com.example.demo.utils;
 
 import java.net.URLEncoder;
 import java.util.Enumeration;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class HttpClientUtils {
 
@@ -30,7 +28,8 @@ public class HttpClientUtils {
     return headersStr.toString();
   }
 
-  public static MultiValueMap<String, String> buildSearchParams(String search, Pageable pageable) throws Exception {
+  public static MultiValueMap<String, String> buildSearchParams(String search, Pageable pageable)
+      throws Exception {
     MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
     queryParams.add("search", URLEncoder.encode(search, "UTF-8"));
     for (Sort.Order order : pageable.getSort()) {

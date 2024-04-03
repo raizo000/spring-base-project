@@ -97,7 +97,6 @@ public class ExternalRequestIntercepter implements ClientHttpRequestInterceptor 
       if (headers != null) {
         msg.append("Headers :").append(headers.toSingleValueMap()).append("\n");
       }
-      response.getBody().reset();
       msg.append("Body : ")
           .append(StreamUtils.copyToString(response.getBody(), Charset.defaultCharset()))
           .append("\n");

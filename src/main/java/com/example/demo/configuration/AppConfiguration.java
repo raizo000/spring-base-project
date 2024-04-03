@@ -1,39 +1,35 @@
 package com.example.demo.configuration;
 
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
-import java.util.concurrent.TimeUnit;
-import org.apache.http.HeaderElement;
-import org.apache.http.HeaderElementIterator;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.config.Registry;
-import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.ConnectionKeepAliveStrategy;
-import org.apache.http.conn.socket.ConnectionSocketFactory;
-import org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.message.BasicHeaderElementIterator;
-import org.apache.http.protocol.HTTP;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.ssl.SSLContextBuilder;
+import java.util.List;
+import java.util.function.Consumer;
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactoryBuilder;
+import org.apache.hc.core5.http.io.SocketConfig;
+import org.apache.hc.core5.http.ssl.TLS;
+import org.apache.hc.core5.pool.PoolConcurrencyPolicy;
+import org.apache.hc.core5.pool.PoolReusePolicy;
+import org.apache.hc.core5.ssl.SSLContexts;
+import org.apache.hc.core5.util.TimeValue;
+import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
@@ -60,62 +56,24 @@ public class AppConfiguration {
   @Bean
   public CloseableHttpClient httpClient() {
     RequestConfig requestConfig =
-        RequestConfig.custom().setConnectionRequestTimeout(REQUEST_TIMEOUT)
-            .setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).build();
+        RequestConfig.custom().setConnectionRequestTimeout(Timeout.ofMilliseconds(REQUEST_TIMEOUT))
+            .setResponseTimeout(Timeout.ofMilliseconds(SOCKET_TIMEOUT)).build();
 
     return HttpClients.custom().setDefaultRequestConfig(requestConfig)
-        .setConnectionManager(poolingConnectionManager())
-        .setKeepAliveStrategy(connectionKeepAliveStrategy())
-        .setSSLHostnameVerifier(new NoopHostnameVerifier()).build();
+        .setConnectionManager(poolingConnectionManager()).build();
   }
 
   @Bean
   public PoolingHttpClientConnectionManager poolingConnectionManager() {
-    SSLContextBuilder builder = new SSLContextBuilder();
-    try {
-      builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
-    } catch (NoSuchAlgorithmException | KeyStoreException e) {
-      LOGGER.error("Pooling Connection Manager Initialisation failure because of " + e.getMessage(),
-          e);
-    }
-
-    SSLConnectionSocketFactory sslsf = null;
-    try {
-      sslsf = new SSLConnectionSocketFactory(builder.build());
-    } catch (KeyManagementException | NoSuchAlgorithmException e) {
-      LOGGER.error("Pooling Connection Manager Initialisation failure because of " + e.getMessage(),
-          e);
-    }
-
-    Registry<ConnectionSocketFactory> socketFactoryRegistry =
-        RegistryBuilder.<ConnectionSocketFactory>create().register("https", sslsf)
-            .register("http", new PlainConnectionSocketFactory()).build();
-
-    PoolingHttpClientConnectionManager poolingConnectionManager =
-        new PoolingHttpClientConnectionManager(socketFactoryRegistry);
-    poolingConnectionManager.setMaxTotal(MAX_TOTAL_CONNECTIONS);
-    poolingConnectionManager.setDefaultMaxPerRoute(MAX_ROUTE_PER_HOST);
-    return poolingConnectionManager;
-  }
-
-  @Bean
-  public ConnectionKeepAliveStrategy connectionKeepAliveStrategy() {
-    return new ConnectionKeepAliveStrategy() {
-      @Override
-      public long getKeepAliveDuration(HttpResponse response, HttpContext context) {
-        HeaderElementIterator it =
-            new BasicHeaderElementIterator(response.headerIterator(HTTP.CONN_KEEP_ALIVE));
-        while (it.hasNext()) {
-          HeaderElement he = it.nextElement();
-          String param = he.getName();
-          String value = he.getValue();
-          if (value != null && param.equalsIgnoreCase("timeout")) {
-            return Long.parseLong(value) * 1000;
-          }
-        }
-        return DEFAULT_KEEP_ALIVE_TIME_MILLIS;
-      }
-    };
+    return PoolingHttpClientConnectionManagerBuilder.create()
+        .setSSLSocketFactory(SSLConnectionSocketFactoryBuilder.create()
+            .setSslContext(SSLContexts.createSystemDefault()).setTlsVersions(TLS.V_1_3).build())
+        .setDefaultSocketConfig(SocketConfig.custom().setSoTimeout(Timeout.ofMinutes(1)).build())
+        .setPoolConcurrencyPolicy(PoolConcurrencyPolicy.STRICT)
+        .setConnPoolPolicy(PoolReusePolicy.LIFO).setMaxConnTotal(MAX_TOTAL_CONNECTIONS)
+        .setDefaultConnectionConfig(ConnectionConfig.custom().setSocketTimeout(Timeout.ofMinutes(1))
+            .setConnectTimeout(Timeout.ofMinutes(1)).setTimeToLive(TimeValue.ofMinutes(10)).build())
+        .build();
   }
 
   @Bean
@@ -128,9 +86,8 @@ public class AppConfiguration {
         try {
           if (connectionManager != null) {
             LOGGER.trace("run IdleConnectionMonitor - Closing expired and idle connections...");
-            connectionManager.closeExpiredConnections();
-            connectionManager.closeIdleConnections(CLOSE_IDLE_CONNECTION_WAIT_TIME_SECS,
-                TimeUnit.SECONDS);
+            connectionManager.closeExpired();;
+            connectionManager.closeIdle(TimeValue.ofSeconds(CLOSE_IDLE_CONNECTION_WAIT_TIME_SECS));
           } else {
             LOGGER.trace(
                 "run IdleConnectionMonitor - Http Client Connection manager is not initialised");
@@ -145,11 +102,11 @@ public class AppConfiguration {
 
   // @Bean
   // public RestTemplate restTemplate() {
-  //   RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory());
-  //   restTemplate.setInterceptors(Collections.singletonList(new ExternalRequestIntercepter()));
-  //   return restTemplate;
+  // RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory());
+  // restTemplate.setInterceptors(Collections.singletonList(new ExternalRequestIntercepter()));
+  // return restTemplate;
   // }
-  
+
   @Bean
   public RestTemplate restTemplate() {
     ClientHttpRequestFactory factory =
@@ -157,6 +114,14 @@ public class AppConfiguration {
     RestTemplate restTemplate = new RestTemplate(factory);
     restTemplate.setInterceptors(Collections.singletonList(new ExternalRequestIntercepter()));
     return restTemplate;
+  }
+
+
+  @Bean
+  public RestClient restClient() {
+
+    return RestClient.builder().requestInterceptor(new ExternalRequestIntercepter())
+        .requestFactory(clientHttpRequestFactory()).build();
   }
 
   @Bean

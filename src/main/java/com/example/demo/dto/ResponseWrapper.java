@@ -3,16 +3,13 @@ package com.example.demo.dto;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-
-import javax.servlet.ServletOutputStream;
-import javax.servlet.ServletResponse;
-import javax.servlet.WriteListener;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
-
-import com.example.demo.utils.TeePrintWriter;
-
 import org.apache.commons.io.output.TeeOutputStream;
+import com.example.demo.utils.TeePrintWriter;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.WriteListener;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponseWrapper;
 
 public class ResponseWrapper extends HttpServletResponseWrapper {
     private final ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -43,7 +40,8 @@ public class ResponseWrapper extends HttpServletResponseWrapper {
                 // EMPTY METHOD
             }
 
-            private TeeOutputStream tee = new TeeOutputStream(ResponseWrapper.super.getOutputStream(), bos);
+            private TeeOutputStream tee =
+                    new TeeOutputStream(ResponseWrapper.super.getOutputStream(), bos);
 
             @Override
             public void write(int b) throws IOException {
