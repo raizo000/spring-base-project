@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import com.example.demo.dto.RequestWrapper;
 import com.example.demo.dto.ResponseWrapper;
 import com.example.demo.utils.HttpClientUtils;
@@ -18,6 +19,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+@Component
 public class InternalRequestInterceptor implements Filter {
   private final Logger log = LoggerFactory.getLogger(this.getClass());
 

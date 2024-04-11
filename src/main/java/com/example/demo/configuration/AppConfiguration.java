@@ -1,8 +1,6 @@
 package com.example.demo.configuration;
 
 import java.util.Collections;
-import java.util.List;
-import java.util.function.Consumer;
 import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -19,13 +17,11 @@ import org.apache.hc.core5.util.TimeValue;
 import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -103,7 +99,8 @@ public class AppConfiguration {
   // @Bean
   // public RestTemplate restTemplate() {
   // RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory());
-  // restTemplate.setInterceptors(Collections.singletonList(new ExternalRequestIntercepter()));
+  // restTemplate.setInterceptors(Collections.singletonList(new
+  // ExternalRequestIntercepter()));
   // return restTemplate;
   // }
 
@@ -115,7 +112,6 @@ public class AppConfiguration {
     restTemplate.setInterceptors(Collections.singletonList(new ExternalRequestIntercepter()));
     return restTemplate;
   }
-
 
   @Bean
   public RestClient restClient() {
@@ -133,4 +129,5 @@ public class AppConfiguration {
     registrationBean.setOrder(2);
     return registrationBean;
   }
+
 }

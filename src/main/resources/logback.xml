@@ -14,7 +14,7 @@
   <appender name="dailyRollingFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <fileNamePattern>
-        ${logging.path}/app/app.%d{yyyy-MM-dd}.log.zip
+        ${logging.file.path}/app/app.%d{yyyy-MM-dd}.log.zip
       </fileNamePattern>
       <maxHistory>30</maxHistory>
     </rollingPolicy>
@@ -35,7 +35,7 @@
   <appender name="requestResponseFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <fileNamePattern>
-          ${logging.path}/requestResponse/request-response.%d{yyyy-MM-dd}.log.zip
+          ${logging.file.path}/requestResponse/request-response.%d{yyyy-MM-dd}.log.zip
       </fileNamePattern>
       <maxHistory>30</maxHistory>
     </rollingPolicy>
@@ -56,7 +56,7 @@
   <appender name="externalRequestResponseFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <fileNamePattern>
-        ${logging.path}/external-requestResponse/request-response.%d{yyyy-MM-dd}.log.zip
+        ${logging.file.path}/external-requestResponse/request-response.%d{yyyy-MM-dd}.log.zip
       </fileNamePattern>
       <maxHistory>30</maxHistory>
     </rollingPolicy>
