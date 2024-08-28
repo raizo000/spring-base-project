@@ -61,3 +61,4 @@
 
   - Tạo chart hiển thị thu chi dựa trên số tiền bán hàng ra trong tháng - số tiền nhập hàng.
   - Tạo chart lợi nhuận dựa trên giá nhập hàng * số lượng hàng bán ra ? 
+# Lịch sửa kho hàng cho sản phẩm
