@@ -1,4 +1,4 @@
-package com.example.demo.configuration;
+package com.example.demo.configuration.logs;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
@@ -8,8 +8,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import com.example.demo.dto.RequestWrapper;
-import com.example.demo.dto.ResponseWrapper;
+import com.example.demo.control.dto.RequestWrapper;
+import com.example.demo.control.dto.ResponseWrapper;
 import com.example.demo.utils.HttpClientUtils;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;

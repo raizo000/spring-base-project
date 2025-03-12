@@ -1,4 +1,4 @@
-package com.example.demo.configuration;
+package com.example.demo.configuration.logs;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;

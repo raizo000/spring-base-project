@@ -1,4 +1,4 @@
-package com.example.demo.dto;
+package com.example.demo.control.dto;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

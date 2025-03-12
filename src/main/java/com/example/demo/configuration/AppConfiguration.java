@@ -27,6 +27,8 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
+import com.example.demo.configuration.logs.ExternalRequestIntercepter;
+import com.example.demo.configuration.logs.InternalRequestInterceptor;
 
 @Configuration
 public class AppConfiguration {
